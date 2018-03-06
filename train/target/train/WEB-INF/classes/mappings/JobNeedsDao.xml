@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.train.modules.dao.JobNeedsDao">
+
+    <insert id="insertJobNeed">
+        insert into jobneeds(JobId, CourseId)values(#{JobId},#{CourseId})
+    </insert>
+
+    <!-- 删除一个岗位需求，即删除这个岗位需求中的全部课程 -->
+    <delete id="deleteByJobId">
+        delete from jobneeds where JobId = #{JobId}
+    </delete>
+
+    <!-- 删除某个岗位需求中的一门课程 -->
+    <delete id="deleteByIds">
+        delete from jobneeds where JobId = #{jobid} and CourseId = #{courseid}
+    </delete>
+
+    <select id="getByJobId" resultType="Map">
+        select n.JobId, j.JobName, co.CourseId, co.CourseName
+        from jobneeds n, course co, job j
+        where n.JobId = #{jobid} and n.CourseId = co.CourseId and n.JobId = j.JobId
+    </select>
+
+    <select id="getJobNeedsDetail" resultType="Map">
+        select c.CourseName, c.Credit, c.CourseType, c.Location, c.Duration, t.TeaName, c.CourseId, j.JobId
+        from jobneeds n, department d, job j, course c, teacher t
+        where d.DeptId=#{deptid}
+        and d.DeptId = j.DeptId
+        and j.JobId = n.JobId
+        and n.CourseId = c.CourseId
+        and c.TeacherId = t.TeacherId
+        and c.CourseId not in
+        (
+        select CourseId from empneeds where EmpId = #{empid}
+        )
+    </select>
+
+</mapper>

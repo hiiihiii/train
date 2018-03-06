@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.train.modules.dao.CourseDao">
+
+    <sql id="courseColumns">
+        CourseId, CourseName, Credit, CourseType, Location, Duration, TeacherId, BookId
+    </sql>
+
+    <sql id="jobNeedsColumns">
+        c.CourseId, c.CourseName, c.Credit, c.CourseType, c.Location, c.Duration, c.Teacherid, c.BookId
+    </sql>
+
+    <!-- 课程是由管理员添加的，而课程使用的教材由教师自己添加 -->
+    <insert id="insertCourse">
+        insert into course(CourseName, Credit, CourseType, Location, Duration, TeacherId)
+        values (#{CourseName}, #{Credit}, #{CourseType}, #{Location}, #{Duration}, #{TeacherId})
+    </insert>
+
+    <delete id="deleteByCourseId">
+        delete course where CourseId=#{CourseId}
+    </delete>
+
+    <update id="updateCourse">
+        update course set
+        CourseName = #{CourseName},
+        Credit = #{Credit},
+        CourseType = #{CourseType},
+        Location = #{Location},
+        Duration = #{Duration},
+        TeacherId = #{TeacherId}
+        where CourseId = #{CourseId}
+    </update>
+
+    <update id="setBook">
+        update course set
+        BookId = #{bookid}
+        where CourseId = #{courseid}
+    </update>
+
+    <select id="getCourseById" resultType="com.train.modules.entity.Course">
+        select <include refid="courseColumns"></include>
+        from course where CourseId = #{CourseId}
+    </select>
+
+    <select id="getAllCourse" resultType="com.train.modules.entity.Course">
+        select <include refid="courseColumns"></include>
+        from course
+    </select>
+
+    <select id="getCourseByTeaId" resultType="com.train.modules.entity.Course">
+        select <include refid="courseColumns"></include>
+        from course where TeacherId = #{TeacherId}
+    </select>
+
+    <!-- 获取某个岗位的岗位需求 -->
+    <select id="getCourseByJobId" resultType="com.train.modules.entity.Course">
+        select <include refid="jobNeedsColumns"></include>
+        from jobneeds j, course c
+        where j.JobId = #{jobid}
+    </select>
+
+    <select id="forJobNeed" resultType="com.train.modules.entity.Course">
+        select * from course
+        where courseid not in
+        (
+        select courseid from jobneeds where JobId=#{jobid}
+        )
+    </select>
+
+    <select id="getCourseDetail" resultType="Map">
+        select
+        c.CourseId,
+        c.CourseName,
+        c.Credit,
+        c.CourseType,
+        c.Location,
+        c.Duration,
+        t.TeacherId,
+        t.TeaName
+        from course c
+        left outer join teacher t on c.TeacherId = t.TeacherId
+    </select>
+
+    <delete id="deleteByCourseIds">
+        DELETE FROM course WHERE CourseId IN
+        <foreach collection="array" item="item" open="(" separator="," close=")">
+            ${item}
+        </foreach>
+    </delete>
+</mapper>

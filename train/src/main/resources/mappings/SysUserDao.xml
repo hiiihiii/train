@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.train.modules.dao.SysUserDao">
+
+    <sql id="sysUserColumns">
+        UserId, UserName, Password
+    </sql>
+
+    <insert id="insertSysUser">
+        INSERT INTO sysuser(UserName,Password) VALUES (#{UserName},#{Password})
+    </insert>
+
+    <select id="sysUserLogin" resultType="com.train.modules.entity.SysUser">
+        SELECT <include refid="sysUserColumns"></include>
+        FROM sysuser WHERE UserName=#{username} and Password = #{psw}
+    </select>
+
+    <delete id="deleteById">
+        DELETE sysuser WHERE UserId = #{id}
+    </delete>
+
+    <select id="getByUserName" resultType="com.train.modules.entity.SysUser">
+        select <include refid="sysUserColumns"></include>
+        from sysuser where UserName = #{username}
+    </select>
+</mapper>

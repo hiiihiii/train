@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.train.modules.dao.DeptDao">
+
+    <sql id="deptColumns">
+        DeptId, DeptName, Manager
+    </sql>
+
+    <insert id="insertDept">
+        INSERT INTO department(DeptName, Manager)
+        VALUES (#{DeptName}, #{Manager})
+    </insert>
+
+    <delete id="deleteDeptById">
+        DELETE department where DeptId=#{DeptId}
+    </delete>
+
+    <!-- 部门的批量删除 -->
+    <delete id="deleteByIds" parameterType="java.util.List">
+        delete from department where DeptId in
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            ${item}
+        </foreach>
+    </delete>
+
+    <update id="updateDept">
+        UPDATE department
+        SET DeptName=#{DeptName}, Manager=#{Manager}
+        WHERE DeptId=#{DeptId}
+    </update>
+
+    <select id="getOneDept" resultType="com.train.modules.entity.Department">
+        SELECT <include refid="deptColumns"></include>
+        FROM department WHERE DeptId=#{DeptId}
+    </select>
+
+    <select id="getAllDepts" resultType="com.train.modules.entity.Department">
+        select <include refid="deptColumns"></include>
+        from department
+    </select>
+
+    <!-- 通过员工实体中的部门号获取部门信息 -->
+    <select id="getByEmpid" resultType="com.train.modules.entity.Department">
+        select
+        d.DeptName
+        from department d, employee e
+        where e.DeptId = d.DeptId
+    </select>
+</mapper>

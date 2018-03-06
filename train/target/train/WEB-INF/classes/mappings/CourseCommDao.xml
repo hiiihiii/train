@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.train.modules.dao.CourseCommDao">
+
+    <sql id="commentColumns">
+        CourseId, EmpId, CommLevel, Content, CommTime
+    </sql>
+
+    <insert id="insertComm">
+        insert into coursecomm(CourseId, EmpId, CommLevel, Content, CommTime)
+        values (#{CourseId}, #{EmpId}, #{CommLevel}, #{Content}, #{CommTime})
+    </insert>
+
+    <delete id="deleteByIds">
+        delete coursecomm where CourseId = #{CourseId} and EmpId = #{EmpId}
+    </delete>
+
+    <delete id="deleteByCourseId">
+        delete coursecomm where CourseId = #{CourseId}
+    </delete>
+
+    <delete id="deleteByEmpId">
+        delete coursecomm where EmpId = #{EmpId}
+    </delete>
+
+    <update id="updateComm">
+        update coursecomm set
+        CommLevel = #{CommLevel},
+        Content = #{Content},
+        CommTime = #{CommTime}
+        where CourseId = #{CourseId} and EmpId = #{EmpId}
+    </update>
+
+    <select id="getCommByIds" resultType="com.train.modules.entity.CourseComm">
+        select <include refid="commentColumns"></include>
+        from coursecomm where CourseId = #{CourseId} and EmpId = #{EmpId}
+    </select>
+
+    <select id="getCommByCourseId" resultType="com.train.modules.entity.CourseComm">
+        select <include refid="commentColumns"></include>
+        from coursecomm where CourseId = #{CourseId}
+    </select>
+
+    <select id="getCommByEmpId" resultType="com.train.modules.entity.CourseComm">
+        select <include refid="commentColumns"></include>
+        from coursecomm where EmpId = #{EmpId}
+    </select>
+</mapper>

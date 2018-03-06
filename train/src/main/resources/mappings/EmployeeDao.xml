@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.train.modules.dao.EmployeeDao">
+
+    <!-- 注意：列名必须与entity中的属性一致 -->
+    <sql id="empColumns">
+        EmpId, Password, EmpName, EmpSex, IdNum, BirthDate, BirthPlace, Nation, Marriage, EntryTime, Address, Telephone, Email, DeptId
+    </sql>
+
+    <select id="employeeLogin" resultType="com.train.modules.entity.Employee">
+        SELECT <include refid="empColumns"></include>
+        FROM employee where EmpId = #{0} and Password = #{1}
+    </select>
+
+    <insert id="insertEmp">
+        insert into employee(Password, EmpName, EmpSex, IdNum, BirthPlace, Nation, Marriage, EntryTime, Address, Telephone, Email, DeptId)
+        values (#{Password}, #{EmpName}, #{EmpSex}, #{IdNum}, #{BirthPlace}, #{Nation}, #{Marriage}, #{EntryTime}, #{Address}, #{Telephone}, #{Email}, #{DeptId})
+    </insert>
+
+    <delete id="deleteByEmpId" parameterType="int">
+        delete from employee where EmpId = #{EmpId}
+    </delete>
+
+    <delete id="deleteByEmpIds">
+        DELETE FROM employee WHERE EmpId IN
+        <foreach collection="array" item="item" open="(" separator="," close=")">
+            ${item}
+        </foreach>
+    </delete>
+
+    <update id="updateEmp">
+        update employee set
+        EmpName = #{EmpName},
+        EmpSex = #{EmpSex},
+        BirthPlace = #{BirthPlace},
+        Nation = #{Nation},
+        Marriage = #{Marriage},
+        EntryTime = #{EntryTime},
+        Address = #{Address},
+        Telephone = #{Telephone},
+        Email = #{Email}
+        where EmpId = #{EmpId}
+    </update>
+
+    <update id="modifyPsw">
+        update employee set
+        Password = #{newPsw}
+        where EmpId = #{empId}
+    </update>
+
+    <select id="getEmpByEmpId" resultType="com.train.modules.entity.Employee">
+        select <include refid="empColumns"></include>
+        from employee where EmpId = #{empId}
+    </select>
+
+    <select id="getAllEmp" resultType="com.train.modules.entity.Employee">
+        select <include refid="empColumns"></include>
+        from employee
+    </select>
+
+    <select id="getEmpByCourseId" resultType="com.train.modules.entity.Employee">
+        SELECT
+        e.EmpId,
+        e.Password,
+        e.EmpName,
+        e.EmpSex,
+        e.IdNum,
+        e.BirthDate,
+        e.BirthPlace,
+        e.Nation,
+        e.Marriage,
+        e.EntryTime,
+        e.Address,
+        e.Telephone,
+        e.Email,
+        e.DeptId
+        from empneeds n, employee e, course c
+        where n.CourseId =c.CourseId and n.EmpId = e.EmpId
+        and c.TeacherId=#{teaid} and c.CourseId = #{courseid}
+    </select>
+</mapper>

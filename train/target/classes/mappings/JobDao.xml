@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.train.modules.dao.JobDao">
+    <sql id="jobColumns">
+        JobId, JobName, JobIntro, DeptId
+    </sql>
+
+    <insert id="insertJob">
+        insert into job(JobName, JobIntro, DeptId)values(#{JobName}, #{JobIntro}, #{DeptId})
+    </insert>
+
+    <delete id="deleteJobById">
+        delete FROM job where JobId = #{JobId}
+    </delete>
+
+    <delete id="deleteByIds" >
+        delete from job where JobId in
+        <foreach item="item" collection="array" open="(" separator="," close=")">
+            ${item}
+        </foreach>
+    </delete>
+
+    <update id="updateJob">
+        update job set JobName = #{JobName}, JobIntro = #{JobIntro}
+        where JobId = #{JobId}
+    </update>
+
+    <select id="getJobById" resultType="com.train.modules.entity.Job">
+        select <include refid="jobColumns"></include>
+        from job where JobId = #{JobId}
+    </select>
+
+    <select id="getAllJobs" resultType="com.train.modules.entity.Job">
+        select <include refid="jobColumns"></include>
+        from job
+    </select>
+
+    <select id="getJobByDeptId" resultType="com.train.modules.entity.Job">
+        select <include refid="jobColumns"></include>
+        from job where DeptId=#{DeptId}
+    </select>
+    
+    <!--<select id="getJobDetail" resultMap="jobinfo">-->
+        <!--select j.JobId, j.JobName, j.JobIntro, j.DeptId, d.DeptName-->
+        <!--from job j-->
+        <!--left outer join department d-->
+        <!--on j.DeptId = d.DeptId-->
+    <!--</select>-->
+
+    <!--<resultMap id="jobinfo" type="com.train.modules.entity.Job">-->
+        <!--<id property="JobId" column="JobId"></id>-->
+        <!--<result property="JobName" column="JobName"></result>-->
+        <!--<result property="JobIntro" column="JobIntro"></result>-->
+        <!--<result property="DeptId" column="DeptId"></result>-->
+        <!--<association property="department" column="DeptId" javaType="com.train.modules.entity.Department">-->
+            <!--<id property="DeptId" column="DeptId"></id>-->
+            <!--<result property="DeptName" column="DeptName"></result>-->
+        <!--</association>-->
+    <!--</resultMap>-->
+    <!-- 一对一查询，如果使用上面的方式，需要在Job这个实体类中增加一个成员 -->
+
+    <select id="getJobDetail" resultType="Map">
+        select j.JobId, j.JobName, j.JobIntro, j.DeptId, d.DeptName
+        from job j
+        left outer join department d
+        on j.DeptId = d.DeptId
+    </select>
+</mapper>

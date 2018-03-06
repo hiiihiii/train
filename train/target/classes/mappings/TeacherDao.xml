@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.train.modules.dao.TeacherDao">
+
+    <sql id="teacherColumns">
+        TeacherId, Password, TeaName, TeaSex, BirthDate, Title, Intro, IdNum
+    </sql>
+
+    <select id="teacherLogin" resultType="com.train.modules.entity.Teacher">
+        SELECT <include refid="teacherColumns"></include>
+        FROM teacher where TeacherId = #{0} and Password=#{1}
+    </select>
+
+    <insert id="insertTeacher">
+        insert into teacher(Password, TeaName, TeaSex, BirthDate, Title, Intro)
+        values(#{Password}, #{TeaName}, #{TeaSex}, #{BirthDate}, #{Title}, #{Intro})
+    </insert>
+
+    <delete id="deleteByTeaId">
+        delete FROM teacher where TeacherId = #{TeacherId}
+    </delete>
+
+    <update id="updateTeacher">
+        update teacher set TeaName=#{TeaName}, TeaSex=#{TeaSex}, IdNum=#{IdNum}, Title=#{Title}, Intro=#{Intro}, Password=#{Password}
+        where TeacherId=#{TeacherId}
+    </update>
+
+    <update id="updateBySys">
+        update teacher set TeaName=#{TeaName}, TeaSex=#{TeaSex}, BirthDate=#{BirthDate}, Title=#{Title}, Intro=#{Intro}
+        where TeacherId=#{TeacherId}
+    </update>
+
+    <update id="modifyPsw">
+        update teacher set Password=#{psw} where TeacherId=#{TeacherId}
+    </update>
+
+    <select id="getTeacherById" resultType="com.train.modules.entity.Teacher">
+        select <include refid="teacherColumns"></include>
+        from teacher where TeacherId=#{TeacherId}
+    </select>
+
+    <select id="getAllTeacher" resultType="com.train.modules.entity.Teacher">
+        select <include refid="teacherColumns"></include>
+        from teacher
+    </select>
+
+    <select id="chooseList" resultType="Map">
+        select
+        e.EmpId,
+        e.EmpName,
+        d.DeptName,
+        c.CourseName,
+        en.Score,
+        en.IsScore,
+        c.CourseId,
+        t.TeacherId
+        from
+        empneeds en, employee e, teacher t, course c, department d
+        where t.TeacherId = #{teaid}
+        and c.Courseid = #{courseid}
+        and t.TeacherId = c.TeacherId
+        and c.CourseId = en.CourseId
+        and en.EmpId = e.EmpId
+        and e.DeptId = d.DeptId
+    </select>
+
+    <delete id="deleteTeaBat">
+        delete from teacher where TeacherId in
+        <foreach item="item" collection="array" open="(" separator="," close=")">
+            ${item}
+        </foreach>
+    </delete>
+
+</mapper>

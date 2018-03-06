@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.train.modules.dao.EmpNeedsDao">
+
+    <insert id="insertEmpNeeds">
+        insert into empneeds(EmpId, CourseId, JobId, Term, Score, IsScore)values(#{EmpId}, #{CourseId}, #{JobId}, #{Term}, #{Score}, #{IsScore})
+    </insert>
+
+    <delete id="deleteByIds">
+        delete from empneeds where EmpId = #{empid} and CourseId = #{CourseId}
+    </delete>
+
+    <update id="setScore">
+        update empneeds set
+        Score = #{score},
+        IsScore =  '1'
+        where EmpId = #{empid} and
+        CourseId = #{courseid}
+    </update>
+
+    <!-- 批量提交成绩 -->
+    <update id="setScoresBat" parameterType="java.util.ArrayList">
+        update empneeds set
+        Score =
+        <foreach collection="scores" item="item" index="index" separator=" " open="(case" close="end)">
+            when EmpId = ${item.empid} and CourseId = ${item.courseid} then ${item.score}
+        </foreach>
+        ,IsScore =
+        <foreach collection="scores" item="item" index="index" separator=" " open="(case" close="end)">
+            when EmpId = ${item.empid} and CourseId = ${item.courseid} then ${item.isscore}
+        </foreach>
+        where EmpId in
+        <foreach collection="scores" index="index" item="item" separator="," open="(" close=")">
+            ${item.empid}
+        </foreach>
+        and
+        CourseId in
+        <foreach collection="scores" index="index" item="item" separator="," open="(" close=")">
+            ${item.courseid}
+        </foreach>
+    </update>
+
+    <select id="getByEmpid" >
+        select c.CourseName, c.Credit, c.CourseType, c.Location, c.Duration, t.TeaName
+        from empneeds e, course c, teacher t WHERE
+        e.CourseId = c.CourseId and c.TeacherId = t.TeacherId
+    </select>
+
+    <select id="getEmpNeedsDetail" resultType="Map">
+        select
+        c.CourseName,
+        c.Credit,
+        c.CourseType,
+        c.Location,
+        c.Duration,
+        t.TeaName,
+        en.Score
+        from empneeds en, course c, teacher t
+        where en.EmpId = #{empid}
+        and en.CourseId = c.CourseId
+        and c.TeacherId = t.TeacherId
+    </select>
+
+    <!-- 获取选课信息以及课程评价信息 -->
+    <!-- 评价信息的有无用于决定是否显示成绩 -->
+    <!-- 因为涉及到空值，所以必须用外联结 -->
+    <select id="checkScore" resultType="Map">
+        select
+        c.CourseName,
+        c.Credit,
+        c.CourseType,
+        c.Location,
+        c.Duration,
+        t.TeaName,
+        en.Score,
+        cc.Content,
+        en.IsScore,
+        en.EmpId,
+        en.CourseId
+        from empneeds en
+        left outer join coursecomm cc on en.EmpId=cc.EmpId and en.CourseId=cc.CourseId
+        left outer join course c on en.CourseId = c.CourseId
+        left outer join teacher t on c.TeacherId =t.TeacherId
+        where en.EmpId = #{empid}
+    </select>
+
+    <select id="checkScores" resultType="Map">
+        SELECT
+        e.EmpId,
+        e.EmpName,
+        d.DeptName,
+        en.Score
+        FROM empneeds en, employee e, department d
+        where en.CourseId = #{courseid} and en.EmpId = e.EmpId and d.DeptId = e.DeptId
+    </select>
+</mapper>
